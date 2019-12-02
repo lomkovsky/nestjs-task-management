@@ -1,4 +1,4 @@
-import { TaskStatus } from './task.model';
+import { TaskStatus } from './task-status.enum';
 export const allowedStatuses = [
   TaskStatus.OPEN,
   TaskStatus.IN_PROGRESS,
