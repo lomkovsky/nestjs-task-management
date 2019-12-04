@@ -7,9 +7,11 @@ import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
 import { DeleteResult } from 'typeorm';
 import { User } from 'src/auth/user.entity';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class TasksService {
+  private logger = new Logger('TaskRepository');
   constructor(
     @InjectRepository(TaskRepository)
     private taskRepository: TaskRepository,
@@ -56,8 +58,12 @@ export class TasksService {
   async updateTaskStatus(id: number, status: TaskStatus, user: User): Promise<Task> {
     const task = await this.getTaskById(id, user);
     task.status = status;
-    await task.save();
-    return task;
+    try {
+      await task.save();
+      return task;
+    } catch (error) {
+      this.logger.error(`Failed to update a task for user "${user.username}". Id: ${id}`, error.stack);
+    }
   }
 
   async deleteTask(id: number, user: User): Promise<DeleteResult> {
